@@ -535,6 +535,8 @@ interface Reminder {
   dueDate: Date | null;
   /** Start date of the reminder */
   startDate: Date | null;
+  /** URL associated with the reminder */
+  url: string | null;
   /** Priority of the reminder (0-9, where 0 is no priority) */
   priority: number;
   /** Whether the reminder has alarms */

@@ -7,6 +7,7 @@
 
 import EventKit
 import Foundation
+import ReminderURL
 
 @objc public class EventKitBridge: NSObject {
     private let eventStore = EKEventStore()
@@ -427,10 +428,11 @@ import Foundation
         @objc public let completionDate: Date?
         @objc public let dueDate: Date?
         @objc public let startDate: Date?
+        @objc public let url: String?
         @objc public let priority: Int
         @objc public let hasAlarms: Bool
         @objc public let externalIdentifier: String?
-        
+
         init(from ekReminder: EKReminder) {
             self.id = ekReminder.calendarItemIdentifier
             self.title = ekReminder.title ?? "Untitled Reminder"
@@ -439,8 +441,9 @@ import Foundation
             self.calendarTitle = ekReminder.calendar.title
             self.completed = ekReminder.isCompleted
             self.completionDate = ekReminder.completionDate
+            self.url = ReminderAttachmentURL(ekReminder)?.absoluteString
             self.externalIdentifier = ekReminder.calendarItemExternalIdentifier
-            
+
             // Convert date components to Date objects if available
             if let dueDateComponents = ekReminder.dueDateComponents {
                 self.dueDate = Foundation.Calendar.current.date(from: dueDateComponents)
@@ -825,7 +828,7 @@ import Foundation
                 reminder.completionDate = nil
             }
         }
-        
+
         if let priority = reminderData["priority"] as? Int {
             reminder.priority = priority
         }

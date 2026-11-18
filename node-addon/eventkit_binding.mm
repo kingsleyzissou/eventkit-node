@@ -834,7 +834,13 @@ Napi::Object ReminderToJSObject(const Napi::CallbackInfo& info, Reminder *remind
     } else {
         jsObject.Set("startDate", env.Null());
     }
-    
+
+    if (reminder.url) {
+        jsObject.Set("url", Napi::String::New(env, [reminder.url UTF8String]));
+    } else {
+        jsObject.Set("url", env.Null());
+    }
+
     jsObject.Set("priority", Napi::Number::New(env, reminder.priority));
     jsObject.Set("hasAlarms", Napi::Boolean::New(env, reminder.hasAlarms));
     
@@ -1637,7 +1643,7 @@ Napi::Value SaveReminder(const Napi::CallbackInfo& info) {
         NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:(timestamp / 1000.0)];
         reminderDict[@"startDate"] = startDate;
     }
-    
+
     // Create a worker to process the save operation
     SaveReminderWorker *worker = new SaveReminderWorker(deferred);
     
