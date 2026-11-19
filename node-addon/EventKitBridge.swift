@@ -786,6 +786,28 @@ import ReminderURL
     }
     
     @objc public func saveReminder(reminderData: NSDictionary, commit: Bool) -> [String: Any]? {
+        let attachmentURL: URL?;
+
+        if let urlString = reminderData["url"] as? String {
+            guard commit else {
+                return [
+                    "success": false,
+                    "error": "Saving a reminder URL requires commit: true"
+                ]
+            }
+
+            guard let url = URL(string: urlString), url.scheme != nil else {
+                return [
+                    "success": false,
+                    "error": "An absolute URL is required"
+                ]
+            }
+
+            attachmentURL = url;
+        } else {
+            attachmentURL = nil;
+        }
+
         // Get the reminder ID if it exists (for updating an existing reminder)
         let reminderId = reminderData["id"] as? String
         
@@ -848,6 +870,27 @@ import ReminderURL
         // Save the reminder
         do {
             try eventStore.save(reminder, commit: commit)
+
+            let id = reminder.calendarItemIdentifier
+            if let attachmentURL = attachmentURL {
+                guard reminder.refresh() else {
+                    return [
+                        "success": false,
+                        "error": "Reminder \(id) was saved, but could not be refreshed before writing its URL"
+                    ]
+                }
+
+                if let error = SetReminderAttachmentURL(reminder, attachmentURL) {
+                    return [
+                        "success": false,
+                        "error": "Reminder \(id) was saved, but its URL attachment failed: \(error.localizedDescription)"
+                    ]
+                }
+
+               // Reload the attachment written through ReminderKit.
+               _ = reminder.refresh()
+            }
+
             return ["success": true, "id": reminder.calendarItemIdentifier]
         } catch {
             return ["success": false, "error": error.localizedDescription]

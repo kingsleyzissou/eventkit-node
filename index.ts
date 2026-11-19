@@ -677,6 +677,8 @@ export interface ReminderData {
   dueDate?: Date;
   /** Start date of the reminder */
   startDate?: Date;
+  /** URL associated with the reminder */
+  url?: string;
   /** Priority of the reminder (0-9, where 0 is no priority) */
   priority?: number;
 }

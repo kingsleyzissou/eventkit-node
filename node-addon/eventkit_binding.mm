@@ -1644,6 +1644,12 @@ Napi::Value SaveReminder(const Napi::CallbackInfo& info) {
         reminderDict[@"startDate"] = startDate;
     }
 
+    // url
+    if (reminderData.Has("url") && reminderData.Get("url").IsString()) {
+        std::string url = reminderData.Get("url").As<Napi::String>().Utf8Value();
+        reminderDict[@"url"] = [NSString stringWithUTF8String:url.c_str()];
+    }
+
     // Create a worker to process the save operation
     SaveReminderWorker *worker = new SaveReminderWorker(deferred);
     
