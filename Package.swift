@@ -19,8 +19,12 @@ let package = Package(
     dependencies: [],
     targets: [
         .target(
+            name: "ReminderURL",
+            path: "node-addon/ReminderURL"
+        ),
+        .target(
             name: "EventKitBridge",
-            dependencies: [],
+            dependencies: ["ReminderURL"],
             path: "node-addon",
             sources: ["EventKitBridge.swift"],
             swiftSettings: [
@@ -28,4 +32,4 @@ let package = Package(
             ]
         )
     ]
-) 
+)
